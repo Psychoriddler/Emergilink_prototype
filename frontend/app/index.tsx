@@ -185,25 +185,37 @@ export default function EmergencyDashboard() {
           <Text style={styles.sectionTitle}>Quick Actions</Text>
           
           <View style={styles.actionsList}>
-            <TouchableOpacity style={styles.actionButton}>
+            <TouchableOpacity 
+              style={styles.actionButton}
+              onPress={() => router.push('/ambulance')}
+            >
               <Ionicons name="car" size={24} color="#2563eb" />
               <Text style={styles.actionText}>Book Ambulance</Text>
               <Ionicons name="chevron-forward" size={20} color="#6b7280" />
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.actionButton}>
+            <TouchableOpacity 
+              style={styles.actionButton}
+              onPress={() => router.push('/hospitals')}
+            >
               <Ionicons name="business" size={24} color="#059669" />
               <Text style={styles.actionText}>Nearby Hospitals</Text>
               <Ionicons name="chevron-forward" size={20} color="#6b7280" />
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.actionButton}>
+            <TouchableOpacity 
+              style={styles.actionButton}
+              onPress={() => router.push('/alerts')}
+            >
               <Ionicons name="warning" size={24} color="#d97706" />
               <Text style={styles.actionText}>Disaster Alerts</Text>
               <Ionicons name="chevron-forward" size={20} color="#6b7280" />
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.actionButton}>
+            <TouchableOpacity 
+              style={styles.actionButton}
+              onPress={() => router.push('/contacts')}
+            >
               <Ionicons name="people" size={24} color="#7c3aed" />
               <Text style={styles.actionText}>Emergency Contacts</Text>
               <Ionicons name="chevron-forward" size={20} color="#6b7280" />
