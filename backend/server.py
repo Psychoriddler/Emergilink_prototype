@@ -411,15 +411,6 @@ async def get_emergency_news(category: str = None, priority: str = None, limit: 
     
     return news[:limit]
 
-@api_router.get("/news/{news_id}", response_model=EmergencyNews)
-async def get_news_details(news_id: str):
-    """Get detailed news article"""
-    news = generate_mock_news()
-    for article in news:
-        if article.id == news_id:
-            return article
-    raise HTTPException(status_code=404, detail="News article not found")
-
 @api_router.get("/news/categories")
 async def get_news_categories():
     """Get available news categories"""
@@ -431,6 +422,15 @@ async def get_news_categories():
             {"id": "community_alert", "name": "Community Alerts", "icon": "people"}
         ]
     }
+
+@api_router.get("/news/{news_id}", response_model=EmergencyNews)
+async def get_news_details(news_id: str):
+    """Get detailed news article"""
+    news = generate_mock_news()
+    for article in news:
+        if article.id == news_id:
+            return article
+    raise HTTPException(status_code=404, detail="News article not found")
 
 # Health check endpoint
 @api_router.get("/health")
