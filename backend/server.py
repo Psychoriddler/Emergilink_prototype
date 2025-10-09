@@ -87,6 +87,18 @@ class DisasterAlert(BaseModel):
     expires_at: datetime
     safety_tips: List[str]
 
+class EmergencyNews(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    title: str
+    summary: str
+    content: str
+    category: str  # 'emergency_response', 'disaster_relief', 'safety_update', 'community_alert'
+    location: str
+    published_at: datetime = Field(default_factory=datetime.utcnow)
+    image_url: Optional[str] = None
+    source: str = "EmergiLink News"
+    priority: str = "normal"  # 'low', 'normal', 'high', 'urgent'
+
 # Mock Data Generators
 def generate_mock_ambulances():
     return [
