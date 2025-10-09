@@ -116,6 +116,9 @@ backend:
         - working: true
           agent: "main"
           comment: "Created POST /api/emergency/sos endpoint with location data and emergency call logging"
+        - working: true
+          agent: "testing"
+          comment: "✅ TESTED: Emergency SOS API working correctly. POST /api/emergency/sos accepts emergency_type, user_id, and location data. Returns emergency call ID, timestamp, and status. Data is being saved to MongoDB successfully. Tested with realistic medical emergency scenario."
   
   - task: "Ambulance Booking System"
     implemented: true
@@ -128,6 +131,9 @@ backend:
         - working: true
           agent: "main"
           comment: "Created ambulance nearby search and booking APIs with mock data"
+        - working: true
+          agent: "testing"
+          comment: "✅ TESTED: Ambulance APIs working correctly. GET /api/ambulances/nearby returns 3 mock ambulances with availability, ratings, and estimated arrival times. POST /api/ambulances/book successfully books ambulances with query parameters for ambulance_id and user_id, location data in request body. Returns booking confirmation with booking_id and estimated arrival time."
   
   - task: "Hospital Directory API"
     implemented: true
@@ -140,6 +146,9 @@ backend:
         - working: true
           agent: "main"
           comment: "Created hospital search and details APIs with mock SF hospital data"
+        - working: true
+          agent: "testing"
+          comment: "✅ TESTED: Hospital APIs working correctly. GET /api/hospitals/nearby returns 3 SF hospitals sorted by distance with specialties, ratings, and emergency services info. GET /api/hospitals/{hospital_id} returns detailed hospital information including departments, wait times, and bed availability."
 
   - task: "Disaster Alerts API"
     implemented: true
@@ -152,6 +161,21 @@ backend:
         - working: true
           agent: "main"
           comment: "Created active alerts API with mock flood and fire warnings"
+        - working: true
+          agent: "testing"
+          comment: "✅ TESTED: Disaster Alerts API working correctly. GET /api/alerts/active returns 2 active mock alerts (flood warning for Mission District and high fire risk for Bay Area) with severity levels, safety tips, and expiration times."
+
+  - task: "Health Check API"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "low"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "testing"
+          comment: "✅ TESTED: Health check API working correctly. GET /api/health returns service status, name, and timestamp."
 
 frontend:
   - task: "Emergency Dashboard UI"
