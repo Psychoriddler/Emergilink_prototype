@@ -48,6 +48,12 @@ export default function RootLayout() {
             title: 'Emergency Contacts',
           }}
         />
+        <Stack.Screen
+          name="news"
+          options={{
+            title: 'Emergency News',
+          }}
+        />
       </Stack>
     </>
   );
