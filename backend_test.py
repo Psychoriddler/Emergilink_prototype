@@ -145,19 +145,16 @@ def test_ambulance_apis():
     # Test ambulance booking
     print("\n--- Testing POST /api/ambulances/book ---")
     if test_ambulance_id:
+        user_id = str(uuid.uuid4())
         booking_data = {
-            "ambulance_id": test_ambulance_id,
-            "user_id": str(uuid.uuid4()),
-            "location": {
-                "latitude": 37.7749,
-                "longitude": -122.4194,
-                "address": "456 Mission Street, San Francisco, CA 94105"
-            }
+            "latitude": 37.7749,
+            "longitude": -122.4194,
+            "address": "456 Mission Street, San Francisco, CA 94105"
         }
         
         try:
             response = requests.post(
-                f"{API_BASE}/ambulances/book",
+                f"{API_BASE}/ambulances/book?ambulance_id={test_ambulance_id}&user_id={user_id}",
                 json=booking_data,
                 headers={"Content-Type": "application/json"},
                 timeout=10
