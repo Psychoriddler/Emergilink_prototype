@@ -556,6 +556,7 @@ def run_all_tests():
     test_results['ambulance_apis'] = test_ambulance_apis()
     test_results['hospital_apis'] = test_hospital_apis()
     test_results['disaster_alerts'] = test_disaster_alerts_api()
+    test_results['emergency_news_apis'] = test_emergency_news_apis()  # NEW: Emergency News API tests
     
     # Test emergency history to verify MongoDB integration
     if emergency_id:
