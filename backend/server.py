@@ -195,6 +195,50 @@ def generate_mock_alerts():
         )
     ]
 
+def generate_mock_news():
+    return [
+        EmergencyNews(
+            title="San Francisco Emergency Response Team Saves Lives in Downtown Fire",
+            summary="Quick response by SF Fire Department and paramedics resulted in successful evacuation of 50+ people from office building.",
+            content="In a remarkable display of coordination, San Francisco's emergency response teams successfully evacuated over 50 people from a downtown office building following an electrical fire on the 12th floor. The incident, which occurred at 2:30 PM yesterday, saw firefighters, paramedics, and police working together to ensure zero casualties. Fire Chief Maria Rodriguez praised the building's emergency systems and the calm response of occupants.",
+            category="emergency_response",
+            location="Downtown San Francisco",
+            published_at=datetime.utcnow() - timedelta(hours=8),
+            image_url="https://images.unsplash.com/photo-1554734867-bf3c00a49371",
+            priority="high"
+        ),
+        EmergencyNews(
+            title="New Emergency Alert System Reduces Response Times by 40%",
+            summary="City-wide implementation of advanced emergency dispatch technology shows significant improvement in response efficiency.",
+            content="San Francisco's new AI-powered emergency dispatch system has shown remarkable results in its first quarter of operation. The system, which integrates real-time traffic data, resource availability, and incident severity scoring, has reduced average emergency response times by 40%. Mayor Johnson announced plans to expand the system to neighboring counties.",
+            category="safety_update",
+            location="San Francisco Bay Area",
+            published_at=datetime.utcnow() - timedelta(hours=16),
+            image_url="https://images.unsplash.com/photo-1599152097274-5da4c5979b9b",
+            priority="normal"
+        ),
+        EmergencyNews(
+            title="Community Emergency Preparedness Workshop This Weekend",
+            summary="Free disaster preparedness training available for all Bay Area residents at Civic Center.",
+            content="The San Francisco Department of Emergency Management is hosting a comprehensive emergency preparedness workshop this Saturday at the Civic Center. The event will cover earthquake safety, fire evacuation procedures, emergency kit preparation, and family communication plans. Registration is free and includes take-home emergency supplies.",
+            category="community_alert",
+            location="San Francisco Civic Center",
+            published_at=datetime.utcnow() - timedelta(hours=24),
+            image_url="https://images.unsplash.com/photo-1619025873875-59dfdd2bbbd6",
+            priority="normal"
+        ),
+        EmergencyNews(
+            title="Earthquake Early Warning System Successfully Alerts Residents",
+            summary="Recent 4.2 magnitude earthquake triggered automated alerts 15 seconds before shaking began.",
+            content="The Bay Area's earthquake early warning system performed flawlessly during yesterday's 4.2 magnitude earthquake near Hayward. Residents received automated alerts on their phones 15 seconds before the shaking began, allowing time to take protective actions. Seismologist Dr. Sarah Chen noted this demonstrates the system's reliability for larger potential earthquakes.",
+            category="disaster_relief",
+            location="Bay Area",
+            published_at=datetime.utcnow() - timedelta(hours=48),
+            image_url="https://images.unsplash.com/photo-1554734867-bf3c00a49371",
+            priority="high"
+        )
+    ]
+
 # Emergency Endpoints
 @api_router.post("/emergency/sos", response_model=EmergencyCall)
 async def trigger_emergency(emergency_data: EmergencyCallCreate):
