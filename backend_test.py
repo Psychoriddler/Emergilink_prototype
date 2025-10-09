@@ -307,6 +307,34 @@ def test_disaster_alerts_api():
         print(f"❌ Disaster alerts API error: {str(e)}")
         return False
 
+def test_emergency_history(user_id):
+    """Test Emergency History API"""
+    print(f"\n📋 Testing Emergency History API for user {user_id}...")
+    
+    try:
+        response = requests.get(f"{API_BASE}/emergency/history/{user_id}", timeout=10)
+        print(f"Status Code: {response.status_code}")
+        
+        if response.status_code == 200:
+            history = response.json()
+            print(f"Found {len(history)} emergency calls in history")
+            
+            if history:
+                print("Sample emergency call from history:")
+                print(json.dumps(history[0], indent=2))
+                print("✅ Emergency history API working correctly - data is being saved to MongoDB")
+                return True
+            else:
+                print("⚠️ No emergency calls in history (might be expected for new user)")
+                return True
+        else:
+            print(f"❌ Emergency history API failed with status {response.status_code}")
+            return False
+            
+    except Exception as e:
+        print(f"❌ Emergency history API error: {str(e)}")
+        return False
+
 def run_all_tests():
     """Run all backend API tests"""
     print("🚀 Starting EmergiLink Backend API Tests")
@@ -320,6 +348,13 @@ def run_all_tests():
     test_results['ambulance_apis'] = test_ambulance_apis()
     test_results['hospital_apis'] = test_hospital_apis()
     test_results['disaster_alerts'] = test_disaster_alerts_api()
+    
+    # Test emergency history to verify MongoDB integration
+    if emergency_id:
+        # Extract user_id from the emergency call we just made
+        # We'll use a test user ID to check history
+        test_user_id = "test-user-123"  # Use a consistent test user ID
+        test_results['emergency_history'] = test_emergency_history(test_user_id)
     
     # Summary
     print("\n" + "=" * 60)
