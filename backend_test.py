@@ -335,6 +335,214 @@ def test_emergency_history(user_id):
         print(f"❌ Emergency history API error: {str(e)}")
         return False
 
+def test_emergency_news_apis():
+    """Test Emergency News APIs"""
+    print("\n📰 Testing Emergency News APIs...")
+    
+    all_tests_passed = True
+    
+    # Test 1: Basic news retrieval
+    print("\n--- Testing GET /api/news (basic retrieval) ---")
+    try:
+        response = requests.get(f"{API_BASE}/news", timeout=10)
+        print(f"Status Code: {response.status_code}")
+        
+        if response.status_code == 200:
+            news = response.json()
+            print(f"Found {len(news)} news articles")
+            
+            if news:
+                print("Sample news article:")
+                print(json.dumps(news[0], indent=2))
+                
+                # Verify news article structure
+                required_fields = ['id', 'title', 'summary', 'content', 'category', 'location', 'published_at', 'priority']
+                article = news[0]
+                missing_fields = [field for field in required_fields if field not in article]
+                
+                if not missing_fields:
+                    print("✅ Emergency News basic retrieval working correctly")
+                    test_news_id = article['id']
+                else:
+                    print(f"❌ News article missing fields: {missing_fields}")
+                    all_tests_passed = False
+                    test_news_id = None
+            else:
+                print("❌ No news articles returned")
+                all_tests_passed = False
+                test_news_id = None
+        else:
+            print(f"❌ Emergency News API failed with status {response.status_code}")
+            all_tests_passed = False
+            test_news_id = None
+            
+    except Exception as e:
+        print(f"❌ Emergency News API error: {str(e)}")
+        all_tests_passed = False
+        test_news_id = None
+    
+    # Test 2: News with limit parameter
+    print("\n--- Testing GET /api/news?limit=3 ---")
+    try:
+        response = requests.get(f"{API_BASE}/news?limit=3", timeout=10)
+        print(f"Status Code: {response.status_code}")
+        
+        if response.status_code == 200:
+            news = response.json()
+            if len(news) <= 3:
+                print(f"✅ News limit parameter working correctly - returned {len(news)} articles")
+            else:
+                print(f"❌ News limit parameter failed - returned {len(news)} articles, expected max 3")
+                all_tests_passed = False
+        else:
+            print(f"❌ News limit parameter test failed with status {response.status_code}")
+            all_tests_passed = False
+            
+    except Exception as e:
+        print(f"❌ News limit parameter test error: {str(e)}")
+        all_tests_passed = False
+    
+    # Test 3: News category filter
+    print("\n--- Testing GET /api/news?category=emergency_response ---")
+    try:
+        response = requests.get(f"{API_BASE}/news?category=emergency_response", timeout=10)
+        print(f"Status Code: {response.status_code}")
+        
+        if response.status_code == 200:
+            news = response.json()
+            if news:
+                # Check if all articles have the correct category
+                correct_category = all(article.get('category') == 'emergency_response' for article in news)
+                if correct_category:
+                    print(f"✅ News category filter working correctly - {len(news)} emergency_response articles")
+                else:
+                    print("❌ News category filter failed - some articles have wrong category")
+                    all_tests_passed = False
+            else:
+                print("✅ No emergency_response articles found (acceptable)")
+        else:
+            print(f"❌ News category filter test failed with status {response.status_code}")
+            all_tests_passed = False
+            
+    except Exception as e:
+        print(f"❌ News category filter test error: {str(e)}")
+        all_tests_passed = False
+    
+    # Test 4: News priority filter
+    print("\n--- Testing GET /api/news?priority=high ---")
+    try:
+        response = requests.get(f"{API_BASE}/news?priority=high", timeout=10)
+        print(f"Status Code: {response.status_code}")
+        
+        if response.status_code == 200:
+            news = response.json()
+            if news:
+                # Check if all articles have the correct priority
+                correct_priority = all(article.get('priority') == 'high' for article in news)
+                if correct_priority:
+                    print(f"✅ News priority filter working correctly - {len(news)} high priority articles")
+                else:
+                    print("❌ News priority filter failed - some articles have wrong priority")
+                    all_tests_passed = False
+            else:
+                print("✅ No high priority articles found (acceptable)")
+        else:
+            print(f"❌ News priority filter test failed with status {response.status_code}")
+            all_tests_passed = False
+            
+    except Exception as e:
+        print(f"❌ News priority filter test error: {str(e)}")
+        all_tests_passed = False
+    
+    # Test 5: News details with valid ID
+    if test_news_id:
+        print(f"\n--- Testing GET /api/news/{test_news_id} ---")
+        try:
+            response = requests.get(f"{API_BASE}/news/{test_news_id}", timeout=10)
+            print(f"Status Code: {response.status_code}")
+            
+            if response.status_code == 200:
+                article = response.json()
+                print("News article details:")
+                print(json.dumps(article, indent=2))
+                
+                # Verify article structure
+                required_fields = ['id', 'title', 'summary', 'content', 'category', 'location', 'published_at', 'priority']
+                missing_fields = [field for field in required_fields if field not in article]
+                
+                if not missing_fields:
+                    print("✅ News details API working correctly")
+                else:
+                    print(f"❌ News details missing fields: {missing_fields}")
+                    all_tests_passed = False
+            else:
+                print(f"❌ News details API failed with status {response.status_code}")
+                all_tests_passed = False
+                
+        except Exception as e:
+            print(f"❌ News details API error: {str(e)}")
+            all_tests_passed = False
+    
+    # Test 6: News details with invalid ID (should return 404)
+    print("\n--- Testing GET /api/news/invalid-id-12345 ---")
+    try:
+        response = requests.get(f"{API_BASE}/news/invalid-id-12345", timeout=10)
+        print(f"Status Code: {response.status_code}")
+        
+        if response.status_code == 404:
+            print("✅ News details with invalid ID correctly returns 404")
+        else:
+            print(f"❌ News details with invalid ID should return 404, got {response.status_code}")
+            all_tests_passed = False
+            
+    except Exception as e:
+        print(f"❌ News details invalid ID test error: {str(e)}")
+        all_tests_passed = False
+    
+    # Test 7: News categories
+    print("\n--- Testing GET /api/news/categories ---")
+    try:
+        response = requests.get(f"{API_BASE}/news/categories", timeout=10)
+        print(f"Status Code: {response.status_code}")
+        
+        if response.status_code == 200:
+            data = response.json()
+            print("News categories:")
+            print(json.dumps(data, indent=2))
+            
+            if 'categories' in data and isinstance(data['categories'], list):
+                categories = data['categories']
+                expected_categories = ['emergency_response', 'disaster_relief', 'safety_update', 'community_alert']
+                
+                # Check if all expected categories are present
+                category_ids = [cat.get('id') for cat in categories]
+                missing_categories = [cat for cat in expected_categories if cat not in category_ids]
+                
+                if not missing_categories:
+                    # Check category structure
+                    valid_structure = all('id' in cat and 'name' in cat and 'icon' in cat for cat in categories)
+                    
+                    if valid_structure:
+                        print(f"✅ News categories API working correctly - {len(categories)} categories with proper structure")
+                    else:
+                        print("❌ News categories missing required fields (id, name, icon)")
+                        all_tests_passed = False
+                else:
+                    print(f"❌ News categories missing expected categories: {missing_categories}")
+                    all_tests_passed = False
+            else:
+                print("❌ News categories response format invalid")
+                all_tests_passed = False
+        else:
+            print(f"❌ News categories API failed with status {response.status_code}")
+            all_tests_passed = False
+            
+    except Exception as e:
+        print(f"❌ News categories API error: {str(e)}")
+        all_tests_passed = False
+    
+    return all_tests_passed
+
 def run_all_tests():
     """Run all backend API tests"""
     print("🚀 Starting EmergiLink Backend API Tests")
