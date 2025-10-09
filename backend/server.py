@@ -391,6 +391,47 @@ async def get_safe_route(
         "danger_zones_avoided": ["Construction zone on 5th Street", "Reported flooding on Mission St"]
     }
 
+# Emergency News Endpoints
+@api_router.get("/news", response_model=List[EmergencyNews])
+async def get_emergency_news(category: str = None, priority: str = None, limit: int = 20):
+    """Get emergency news and updates"""
+    news = generate_mock_news()
+    
+    # Filter by category if provided
+    if category:
+        news = [n for n in news if n.category == category]
+    
+    # Filter by priority if provided
+    if priority:
+        news = [n for n in news if n.priority == priority]
+    
+    # Sort by priority (urgent > high > normal > low) then by published_at
+    priority_order = {'urgent': 0, 'high': 1, 'normal': 2, 'low': 3}
+    news.sort(key=lambda x: (priority_order.get(x.priority, 3), -x.published_at.timestamp()))
+    
+    return news[:limit]
+
+@api_router.get("/news/{news_id}", response_model=EmergencyNews)
+async def get_news_details(news_id: str):
+    """Get detailed news article"""
+    news = generate_mock_news()
+    for article in news:
+        if article.id == news_id:
+            return article
+    raise HTTPException(status_code=404, detail="News article not found")
+
+@api_router.get("/news/categories")
+async def get_news_categories():
+    """Get available news categories"""
+    return {
+        "categories": [
+            {"id": "emergency_response", "name": "Emergency Response", "icon": "medical"},
+            {"id": "disaster_relief", "name": "Disaster Relief", "icon": "warning"},
+            {"id": "safety_update", "name": "Safety Updates", "icon": "shield-checkmark"},
+            {"id": "community_alert", "name": "Community Alerts", "icon": "people"}
+        ]
+    }
+
 # Health check endpoint
 @api_router.get("/health")
 async def health_check():
