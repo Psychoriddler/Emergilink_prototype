@@ -157,6 +157,84 @@
 
         // --- Page Content Definitions ---
 
+        const tanyaVermaProfile = `
+            <div class="py-4">
+                <div class="flex flex-col items-center bg-white p-6 rounded-xl shadow-lg mb-6">
+                    <div class="w-20 h-20 bg-pink-100 rounded-full flex items-center justify-center mb-3">
+                        <i data-lucide="user" class="w-10 h-10 text-pink-500"></i>
+                    </div>
+                    <h1 class="text-2xl font-bold text-gray-800">Tanya Verma</h1>
+                    <p class="text-md text-gray-500">Junior Architect, Ahmedabad</p>
+                    <button onclick="handleAction('Edit Profile', 'Accessing profile editing mode...', 'settings')" class="mt-3 text-sm font-medium text-pink-500 hover:text-pink-700 transition duration-150">
+                        Edit Information
+                    </button>
+                </div>
+
+                <div class="space-y-6">
+                    <!-- Basic Information -->
+                    <div class="bg-white p-5 rounded-xl shadow-md border border-gray-100">
+                        <h2 class="text-xl font-semibold text-gray-800 mb-3 flex items-center">
+                            <i data-lucide="info" class="w-5 h-5 mr-2 text-pink-500"></i>
+                            Basic Information
+                        </h2>
+                        <ul class="text-sm space-y-2 text-gray-600">
+                            <li><strong class="font-medium text-gray-700">Name:</strong> Tanya Verma</li>
+                            <li><strong class="font-medium text-gray-700">Age:</strong> 26</li>
+                            <li><strong class="font-medium text-gray-700">Profession:</strong> Junior Architect</li>
+                            <li><strong class="font-medium text-gray-700">Location:</strong> Ahmedabad, India</li>
+                        </ul>
+                    </div>
+
+                    <!-- Medical History & Health Needs -->
+                    <div class="bg-white p-5 rounded-xl shadow-md border border-gray-100">
+                        <h2 class="text-xl font-semibold text-gray-800 mb-3 flex items-center">
+                            <i data-lucide="heart-pulse" class="w-5 h-5 mr-2 text-red-500"></i>
+                            Medical & Health Needs
+                        </h2>
+                        <p class="text-sm mb-3 text-gray-600">Good overall health. **Mild Asthma** (triggered by dust/construction environments). Occasionally uses an inhaler.</p>
+                        <h3 class="font-semibold text-gray-700 text-sm mb-1">System Needs:</h3>
+                        <ul class="text-xs space-y-1 list-disc list-inside text-gray-500">
+                            <li>Rapid SOS activation during flare-ups.</li>
+                            <li>Automatic guardian notifications.</li>
+                            <li>Clear location-sharing during medical distress.</li>
+                        </ul>
+                    </div>
+                    
+                    <!-- Personality & Behavior -->
+                    <div class="bg-white p-5 rounded-xl shadow-md border border-gray-100">
+                        <h2 class="text-xl font-semibold text-gray-800 mb-3 flex items-center">
+                            <i data-lucide="user-check" class="w-5 h-5 mr-2 text-blue-500"></i>
+                            Personality & Behavior
+                        </h2>
+                        <p class="text-sm mb-3 text-gray-600">Generally calm but becomes anxious in emergencies. Values clarity, reliability, and quick access.</p>
+                        <h3 class="font-semibold text-gray-700 text-sm mb-1">Design Implications:</h3>
+                        <ul class="text-xs space-y-1 list-disc list-inside text-gray-500">
+                            <li>Relies on visual cues more than long instructions.</li>
+                            <li>Needs minimal steps during high-stress moments.</li>
+                            <li>Prefers simple, visually clear interfaces.</li>
+                        </ul>
+                    </div>
+
+                    <!-- Emergency Background & Motivations -->
+                    <div class="bg-white p-5 rounded-xl shadow-md border border-gray-100">
+                        <h2 class="text-xl font-semibold text-gray-800 mb-3 flex items-center">
+                            <i data-lucide="alert-triangle" class="w-5 h-5 mr-2 text-orange-500"></i>
+                            Motivation
+                        </h2>
+                        <p class="text-sm mb-3 text-gray-600">Previously struggled managing a family medical emergency. Wants a faster, clearer system for contacting help.</p>
+                        <h3 class="font-semibold text-gray-700 text-sm mb-1">Strong Needs:</h3>
+                        <ul class="text-xs space-y-1 list-disc list-inside text-gray-500">
+                            <li>One-tap SOS.</li>
+                            <li>Location verification.</li>
+                            <li>Fewer choices under stress.</li>
+                            <li>Real-time updates during emergencies.</li>
+                        </ul>
+                    </div>
+                    
+                </div>
+            </div>
+        `;
+
         const pages = {
             'home': `
                 <!-- Header Section - EmergiLink -->
@@ -282,7 +360,7 @@
             `,
             'alerts': generateGenericPage('Alerts'),
             'news': generateGenericPage('News'),
-            'profile': generateGenericPage('Profile'),
+            'profile': tanyaVermaProfile, // Use the specific profile content here
         };
 
         /**
@@ -337,7 +415,7 @@
         // --- Button Action Handlers ---
 
         /**
-         * Handler for all general action buttons (e.g., Share Location, Safety Tips).
+         * Handler for all general action buttons (e.g., Share Location, Safety Tips, Edit Profile).
          */
         function handleAction(actionName, message, icon) {
             showModal(actionName, message, icon);
