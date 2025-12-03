@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EmergiLink - Emergency Support Prototype</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Load Lucide Icons for vector icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+    <style>
+        /* Custom CSS to ensure full viewport height on mobile and smooth scrolling */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f7f7f7;
+            padding-bottom: 4rem; /* Space for the fixed footer/navbar */
+        }
+        .app-container {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        /* Gradient definitions for cards/header based on images */
+        .header-gradient {
+            background-image: linear-gradient(135deg, #ff7e5f 0%, #feb47b 100%);
+        }
+        .sos-gradient {
+            background-image: linear-gradient(135deg, #ff7e5f 0%, #ff523a 100%);
+        }
+        .ambulance-gradient {
+            background-image: linear-gradient(135deg, #ff523a 0%, #ff9952 100%);
+        }
+        .police-gradient {
+            background-image: linear-gradient(135deg, #5e72e4 0%, #8ec5fc 100%);
+        }
+        .fire-gradient {
+            background-image: linear-gradient(135deg, #f9c74f 0%, #ff8a00 100%);
+        }
+
+        /* Keyframe for the pop-up entrance effect */
+        @keyframes fadeInScale {
+            from {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1);
+            }
+        }
+        .modal-animate {
+            animation: fadeInScale 0.3s ease-out forwards;
+        }
+
+        /* Transition for hover effects on buttons */
+        .btn-hover-effect {
+            transition: all 0.2s ease-in-out;
+        }
+        .btn-hover-effect:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Simple icon color transition for the navbar */
+        .nav-icon {
+            transition: color 0.15s ease-in-out, transform 0.15s ease-in-out;
+        }
+        .nav-icon:hover {
+            color: #ff523a; /* Match a primary color */
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body class="app-container">
+
+    <!-- Global Success/Action Popup Modal -->
+    <div id="action-modal" class="fixed inset-0 bg-gray-900 bg-opacity-70 hidden z-50">
+        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white p-6 rounded-xl shadow-2xl w-11/12 max-w-sm modal-animate" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+            <h3 id="modal-title" class="text-xl font-bold text-gray-800 mb-4">Action Completed</h3>
+            <div id="modal-content" class="text-center">
+                <!-- Content injected by JS -->
+            </div>
+            <button onclick="hideModal()" class="mt-6 w-full py-2 bg-pink-500 text-white font-semibold rounded-lg hover:bg-pink-600 transition duration-150 shadow-md">
+                Got It
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Content Area -->
+    <main id="main-content" class="flex-grow p-4 sm:p-6 pb-20">
+        <!-- Page content will be injected here -->
+    </main>
+
+    <!-- Fixed Bottom Navigation Bar -->
+    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg z-40 p-2">
+        <div class="flex justify-around max-w-xl mx-auto">
+            <button onclick="navigate('home')" id="nav-home" class="flex flex-col items-center p-2 text-pink-500 nav-icon">
+                <i data-lucide="home" class="w-6 h-6"></i>
+                <span class="text-xs mt-1 font-medium">Home</span>
+            </button>
+            <button onclick="navigate('ambulance')" id="nav-ambulance" class="flex flex-col items-center p-2 text-gray-500 hover:text-pink-500 nav-icon">
+                <i data-lucide="ambulance" class="w-6 h-6"></i>
+                <span class="text-xs mt-1 font-medium">Ambulance</span>
+            </button>
+            <button onclick="navigate('alerts')" id="nav-alerts" class="flex flex-col items-center p-2 text-gray-500 hover:text-pink-500 nav-icon">
+                <i data-lucide="bell" class="w-6 h-6"></i>
+                <span class="text-xs mt-1 font-medium">Alerts</span>
+            </button>
+            <button onclick="navigate('news')" id="nav-news" class="flex flex-col items-center p-2 text-gray-500 hover:text-pink-500 nav-icon">
+                <i data-lucide="newspaper" class="w-6 h-6"></i>
+                <span class="text-xs mt-1 font-medium">News</span>
+            </button>
+            <button onclick="navigate('profile')" id="nav-profile" class="flex flex-col items-center p-2 text-gray-500 hover:text-pink-500 nav-icon">
+                <i data-lucide="user" class="w-6 h-6"></i>
+                <span class="text-xs mt-1 font-medium">Profile</span>
+            </button>
+        </div>
+    </nav>
+
+
+    <!-- JavaScript for Navigation, State Management, and Interactivity -->
+    <script>
+        // Global state for navigation
+        let currentPage = 'home';
+        const contentDiv = document.getElementById('main-content');
+        const modal = document.getElementById('action-modal');
+        const modalTitle = document.getElementById('modal-title');
+        const modalContent = document.getElementById('modal-content');
+
+        // --- Core Modal Functions ---
+
+        /**
+         * Displays the success modal with specific content.
+         * @param {string} title - The title of the modal.
+         * @param {string} message - The message displayed in the modal.
+         * @param {string} icon - The Lucide icon name to display (e.g., 'check-circle', 'phone', 'map-pin').
+         */
+        function showModal(title, message, icon) {
+            modalTitle.textContent = title;
+            modalContent.innerHTML = `
+                <div class="flex justify-center mb-4">
+                    <i data-lucide="${icon}" class="w-16 h-16 text-pink-500"></i>
+                </div>
+                <p class="text-lg text-gray-600">${message}</p>
+                <small class="text-gray-400 mt-2 block">Prototype Action: No actual call or share function performed.</small>
+            `;
+            lucide.createIcons(); // Re-render Lucide icons inside the modal
+            modal.classList.remove('hidden');
+        }
+
+        function hideModal() {
+            modal.classList.add('hidden');
+        }
+
+        // --- Page Content Definitions ---
+
+        const pages = {
+            'home': `
+                <!-- Header Section - EmergiLink -->
+                <div class="header-gradient text-white p-12 sm:p-16 rounded-b-2xl mb-8 shadow-xl">
+                    <div class="max-w-md mx-auto text-center">
+                        <h1 class="text-3xl font-extrabold mb-1">EmergiLink</h1>
+                        <p class="text-sm font-light opacity-90">Your Emergency Support Partner</p>
+                        <p class="mt-4 text-xs flex items-center justify-center opacity-80">
+                            <i data-lucide="map-pin" class="w-4 h-4 mr-2"></i>
+                            Location Services Active
+                        </p>
+                    </div>
+                </div>
+
+                <!-- SOS Button Section -->
+                <div class="flex justify-center my-10">
+                    <button onclick="triggerSOS()" class="sos-gradient w-48 h-48 sm:w-60 sm:h-60 rounded-full flex items-center justify-center text-white text-3xl font-bold uppercase shadow-2xl transform transition duration-300 hover:scale-[1.05] active:scale-[0.95]">
+                        <div class="animate-pulse">SOS</div>
+                    </button>
+                </div>
+
+                <!-- Emergency Services Quick Access (Visible on home scroll down in one of the images) -->
+                <div class="mt-12">
+                    <h2 class="text-xl font-bold text-gray-800 mb-4">Emergency Services (Tap for Call)</h2>
+                    <div class="space-y-4">
+                        <div class="ambulance-gradient p-4 rounded-xl shadow-md flex items-center justify-between btn-hover-effect">
+                            <div class="flex items-center text-white">
+                                <i data-lucide="ambulance" class="w-8 h-8 mr-4"></i>
+                                <div>
+                                    <span class="text-lg font-semibold">Ambulance</span>
+                                    <p class="text-sm opacity-80">108</p>
+                                </div>
+                            </div>
+                            <button onclick="handleCall('Ambulance', '108')" class="bg-white bg-opacity-30 hover:bg-opacity-50 text-white font-bold py-2 px-6 rounded-full transition duration-150">Call</button>
+                        </div>
+
+                        <div class="police-gradient p-4 rounded-xl shadow-md flex items-center justify-between btn-hover-effect">
+                            <div class="flex items-center text-white">
+                                <i data-lucide="shield-check" class="w-8 h-8 mr-4"></i>
+                                <div>
+                                    <span class="text-lg font-semibold">Police</span>
+                                    <p class="text-sm opacity-80">100</p>
+                                </div>
+                            </div>
+                            <button onclick="handleCall('Police', '100')" class="bg-white bg-opacity-30 hover:bg-opacity-50 text-white font-bold py-2 px-6 rounded-full transition duration-150">Call</button>
+                        </div>
+
+                        <div class="fire-gradient p-4 rounded-xl shadow-md flex items-center justify-between btn-hover-effect">
+                            <div class="flex items-center text-white">
+                                <i data-lucide="flame" class="w-8 h-8 mr-4"></i>
+                                <div>
+                                    <span class="text-lg font-semibold">Fire Department</span>
+                                    <p class="text-sm opacity-80">101</p>
+                                </div>
+                            </div>
+                            <button onclick="handleCall('Fire Department', '101')" class="bg-white bg-opacity-30 hover:bg-opacity-50 text-white font-bold py-2 px-6 rounded-full transition duration-150">Call</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="mt-8">
+                    <h2 class="text-xl font-bold text-gray-800 mb-4">Quick Actions</h2>
+                    <div class="grid grid-cols-2 gap-4">
+                        <button onclick="handleAction('Share Location', 'Your current location has been securely shared with your emergency contacts.', 'share-2')" class="bg-white p-4 rounded-xl shadow-md flex flex-col items-center justify-center btn-hover-effect border border-gray-100">
+                            <i data-lucide="map-pin" class="w-6 h-6 text-pink-500 mb-2"></i>
+                            <span class="text-sm font-semibold text-gray-700">Share Location</span>
+                        </button>
+                        <button onclick="handleAction('Safety Tips', 'Loading the latest safety tips and guidelines...', 'book-open')" class="bg-white p-4 rounded-xl shadow-md flex flex-col items-center justify-center btn-hover-effect border border-gray-100">
+                            <i data-lucide="lock" class="w-6 h-6 text-pink-500 mb-2"></i>
+                            <span class="text-sm font-semibold text-gray-700">Safety Tips</span>
+                        </button>
+                    </div>
+                </div>
+            `,
+            'ambulance': `
+                <div class="py-4">
+                    <h1 class="text-2xl font-bold text-gray-800 mb-2">Emergency Services</h1>
+                    <p class="text-sm text-gray-500 mb-6">Press for immediate emergency assistance</p>
+
+                    <div class="flex items-center justify-center mb-6">
+                        <button onclick="handleAction('Set Location', 'Your emergency location has been set and confirmed.', 'map')" class="flex items-center text-sm font-medium text-pink-500 p-2 rounded-full bg-white shadow-md border border-gray-100 hover:bg-gray-50 transition duration-150">
+                            <i data-lucide="map-pin" class="w-4 h-4 mr-1"></i>
+                            Set Location
+                        </button>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <div class="ambulance-gradient p-4 rounded-xl shadow-md flex items-center justify-between btn-hover-effect">
+                            <div class="flex items-center text-white">
+                                <i data-lucide="ambulance" class="w-8 h-8 mr-4"></i>
+                                <div>
+                                    <span class="text-lg font-semibold">Ambulance</span>
+                                    <p class="text-sm opacity-80">108</p>
+                                </div>
+                            </div>
+                            <button onclick="handleCall('Ambulance', '108')" class="bg-white bg-opacity-30 hover:bg-opacity-50 text-white font-bold py-2 px-6 rounded-full transition duration-150">Call</button>
+                        </div>
+
+                        <div class="police-gradient p-4 rounded-xl shadow-md flex items-center justify-between btn-hover-effect">
+                            <div class="flex items-center text-white">
+                                <i data-lucide="shield-check" class="w-8 h-8 mr-4"></i>
+                                <div>
+                                    <span class="text-lg font-semibold">Police</span>
+                                    <p class="text-sm opacity-80">100</p>
+                                </div>
+                            </div>
+                            <button onclick="handleCall('Police', '100')" class="bg-white bg-opacity-30 hover:bg-opacity-50 text-white font-bold py-2 px-6 rounded-full transition duration-150">Call</button>
+                        </div>
+
+                        <div class="fire-gradient p-4 rounded-xl shadow-md flex items-center justify-between btn-hover-effect">
+                            <div class="flex items-center text-white">
+                                <i data-lucide="flame" class="w-8 h-8 mr-4"></i>
+                                <div>
+                                    <span class="text-lg font-semibold">Fire Department</span>
+                                    <p class="text-sm opacity-80">101</p>
+                                </div>
+                            </div>
+                            <button onclick="handleCall('Fire Department', '101')" class="bg-white bg-opacity-30 hover:bg-opacity-50 text-white font-bold py-2 px-6 rounded-full transition duration-150">Call</button>
+                        </div>
+                    </div>
+                </div>
+            `,
+            'alerts': generateGenericPage('Alerts'),
+            'news': generateGenericPage('News'),
+            'profile': generateGenericPage('Profile'),
+        };
+
+        /**
+         * Generates content for the non-critical pages.
+         * @param {string} pageName - The name of the page.
+         */
+        function generateGenericPage(pageName) {
+            return `
+                <div class="text-center py-20">
+                    <h1 class="text-3xl font-bold text-gray-800 mb-4">${pageName}</h1>
+                    <i data-lucide="rocket" class="w-12 h-12 text-gray-400 mx-auto mb-4"></i>
+                    <p class="text-gray-500">This is the ${pageName} section.</p>
+                    <p class="text-sm text-gray-400 mt-2">Content to be added in high-fidelity phase.</p>
+                    <button onclick="navigate('home')" class="mt-8 py-2 px-4 bg-pink-500 text-white rounded-lg shadow-md hover:bg-pink-600 transition duration-150">Go Home</button>
+                </div>
+            `;
+        }
+
+        // --- Navigation and Routing ---
+
+        /**
+         * Handles navigation between pages.
+         * @param {string} targetPage - The key of the page to navigate to.
+         */
+        function navigate(targetPage) {
+            if (currentPage === targetPage) return; // Prevent unnecessary re-render
+
+            currentPage = targetPage;
+            
+            // Render content
+            contentDiv.innerHTML = pages[targetPage];
+            
+            // Re-initialize Lucide icons for the new content
+            lucide.createIcons();
+            
+            // Update active state of navigation bar
+            document.querySelectorAll('.nav-icon').forEach(btn => {
+                const navId = btn.id.replace('nav-', '');
+                if (navId === targetPage) {
+                    btn.classList.add('text-pink-500');
+                    btn.classList.remove('text-gray-500');
+                } else {
+                    btn.classList.remove('text-pink-500');
+                    btn.classList.add('text-gray-500');
+                }
+            });
+
+            // Ensure we scroll to the top of the new page content
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // --- Button Action Handlers ---
+
+        /**
+         * Handler for all general action buttons (e.g., Share Location, Safety Tips).
+         */
+        function handleAction(actionName, message, icon) {
+            showModal(actionName, message, icon);
+        }
+
+        /**
+         * Handler for the Call buttons.
+         */
+        function handleCall(service, number) {
+            showModal(
+                `Calling ${service}...`,
+                `Virtually initiating call to **${number}**. Awaiting operator connection.`,
+                'phone'
+            );
+        }
+        
+        /**
+         * Handler for the main SOS button.
+         */
+        function triggerSOS() {
+            showModal(
+                "SOS Triggered!",
+                "Emergency signal sent to all services (100, 101, 108) and emergency contacts. Help is on the way.",
+                'life-buoy'
+            );
+        }
+
+        // --- Initialization ---
+        
+        // Initial page load
+        window.onload = function() {
+            navigate('home');
+        }
+
+    </script>
+</body>
+</html>
